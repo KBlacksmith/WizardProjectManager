@@ -4,78 +4,10 @@
 #include <filesystem>
 #include <fstream>
 #include <regex>
+#include "functions.hpp"
+#include "help.hpp"
+#include "validations.hpp"
 
-void trimmer(std::string *arg){
-    auto start = 0;
-    auto end = arg->length();
-    if(arg->compare("")){
-        while (arg->substr(start, end-start).starts_with(" "))
-        {
-            start++;
-        }
-        while (arg->substr(start, end-start).ends_with(" "))
-        {
-            end--;
-        }
-        arg->assign(arg->substr(start, end-start));
-    }
-}
-
-void abortApp(){
-    std::cout << "Abort. \n";
-}
-
-bool validateChoice(){
-    std::string choice;
-    while (std::getline(std::cin, choice))
-    {
-        trimmer(&choice);
-        if(std::regex_match(choice, std::regex("[yYnN]")))
-            return (choice.compare("y") == 0 || choice.compare("Y") == 0);    
-        else
-            std::cout << "[Y/n]: ";   
-    }
-    abortApp();
-    return false;
-}
-bool validateName(std::string *name){
-    return std::regex_match(name->data(), std::regex("[a-zA-Z]([a-zA-Z0-9]|[-]|[_])*"));
-}
-
-std::string getProjectName(){
-    std::string pName;
-    std::cout << "Enter the name of your new package: ";
-    while (std::getline(std::cin, pName))
-    {
-        trimmer(&pName);
-        if(validateName(&pName))
-            return pName;
-        else
-            std::cout << "Please enter a valid name: ";
-    }
-    abortApp();
-    return "";
-}
-
-std::string getProjectLang(std::map<std::string, std::string> *langs){
-    std::string pLang;
-    
-    std::cout << "Languages available: \n";
-    for(auto lang: *langs){
-        std::cout << " * " << lang.first << std::endl;
-    }
-    std::cout << "Select a lanaguage from the list: ";
-    while (getline(std::cin, pLang))
-    {
-        trimmer(&pLang);
-        if(langs->contains(pLang))
-            return pLang;
-        else
-            std::cout << "Try again. \n";
-    }
-    abortApp();
-    return "";
-}
 
 void createProject(std::string name, std::string extension){
     std::map<std::string, std::string> temp{
@@ -150,18 +82,6 @@ void createComponent(std::string component){
     else{
         std::cout << "File \""+component+"."+ext+"\" already exists.\n";
     }
-}
-
-void help(){
-    std::cout << "Usage: wizard [option]\n";
-    std::cout << "Available commands: \n";
-    std::cout << "\tconjure\tCreate a new package for a project\n";
-    std::cout << "\tspell\tCreate new component file\n";
-    std::cout << "\thelp\tDisplay list of commands and options\n";
-    std::cout << "\tlist\tLists supported programing languages\n";
-    //std::cout << "\tcharm\tInitializes directory as wizard project\n";
-    //std::cout << "\tsettings\n";
-    //std::cout << "\ttree\tProject tree\n";
 }
 
 int main(int argc, char * argv[]){
